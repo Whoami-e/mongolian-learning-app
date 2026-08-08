@@ -11,6 +11,7 @@ dist/
 # IDE / editor caches
 .idea/
 .reasonix/
+.workbuddy
 
 # Watchman
 .watchmanconfig
