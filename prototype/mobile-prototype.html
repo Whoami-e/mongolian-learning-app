@@ -1,0 +1,769 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>竖文启蒙 - 产品原型</title>
+  <style>
+    :root {
+      --paper: #f7f2e8;
+      --paper-deep: #ece2d0;
+      --ink: #20201d;
+      --muted: #776f63;
+      --blue: #2c6e8f;
+      --blue-dark: #1f526c;
+      --red: #c95b46;
+      --gold: #d7a441;
+      --teal: #3b7c6e;
+      --line: rgba(32, 32, 29, 0.14);
+      --shadow: 0 18px 50px rgba(54, 43, 29, 0.16);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #d9d0c0;
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    }
+
+    .board {
+      min-height: 100vh;
+      padding: 38px;
+      background:
+        linear-gradient(90deg, rgba(32, 32, 29, 0.045) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(32, 32, 29, 0.035) 1px, transparent 1px),
+        #d9d0c0;
+      background-size: 28px 28px;
+    }
+
+    .header {
+      max-width: 1320px;
+      margin: 0 auto 26px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: end;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 34px;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 0;
+      max-width: 760px;
+      color: #50483e;
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    .principle {
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      background: rgba(247, 242, 232, 0.76);
+      border-radius: 8px;
+      color: #4b443b;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .grid {
+      max-width: 1320px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 28px;
+      align-items: start;
+    }
+
+    .screen-block {
+      display: grid;
+      gap: 12px;
+      justify-items: center;
+    }
+
+    .screen-title {
+      width: 310px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+    }
+
+    .screen-title strong {
+      font-size: 15px;
+    }
+
+    .screen-title span {
+      font-size: 12px;
+      color: #685f54;
+    }
+
+    .phone {
+      width: 310px;
+      height: 670px;
+      border-radius: 30px;
+      padding: 16px;
+      background: #191816;
+      box-shadow: var(--shadow);
+    }
+
+    .screen {
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+      border-radius: 22px;
+      background:
+        linear-gradient(90deg, rgba(32, 32, 29, 0.035) 1px, transparent 1px),
+        var(--paper);
+      background-size: 18px 18px;
+      padding: 18px;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .kicker {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.2;
+    }
+
+    .title {
+      margin-top: 2px;
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.16;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .pill {
+      min-height: 34px;
+      padding: 8px 11px;
+      border-radius: 999px;
+      background: rgba(44, 110, 143, 0.11);
+      color: var(--blue-dark);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 252, 246, 0.72);
+      box-shadow: 0 8px 18px rgba(48, 37, 23, 0.06);
+    }
+
+    .hero-card {
+      position: relative;
+      min-height: 190px;
+      padding: 18px;
+      margin-bottom: 15px;
+      display: grid;
+      grid-template-columns: 1fr 90px;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .vertical-glyph {
+      writing-mode: vertical-lr;
+      text-orientation: sideways;
+      justify-self: center;
+      font-size: 62px;
+      line-height: 0.95;
+      color: var(--ink);
+      font-family: "Noto Sans Mongolian", "Mongolian Baiti", serif;
+    }
+
+    .option,
+    .lex-glyph,
+    .form-cell b {
+      writing-mode: vertical-lr;
+      text-orientation: sideways;
+      font-family: "Noto Sans Mongolian", "Mongolian Baiti", serif;
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 43px;
+      padding: 0 18px;
+      border-radius: 8px;
+      background: var(--blue);
+      color: white;
+      font-size: 14px;
+      font-weight: 800;
+      border: 0;
+      box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.18);
+    }
+
+    .button.secondary {
+      background: rgba(32, 32, 29, 0.07);
+      color: var(--ink);
+      box-shadow: none;
+    }
+
+    .course-list {
+      display: grid;
+      gap: 9px;
+    }
+
+    .course {
+      min-height: 56px;
+      padding: 11px 12px;
+      display: grid;
+      grid-template-columns: 34px 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .stamp {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--gold);
+      color: #fff9ea;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .stamp.open {
+      background: var(--blue);
+    }
+
+    .stamp.todo {
+      background: rgba(32, 32, 29, 0.1);
+      color: #5f574d;
+    }
+
+    .bottom-nav {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      height: 58px;
+      border-radius: 14px;
+      background: rgba(255, 252, 246, 0.92);
+      border: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      align-items: center;
+      text-align: center;
+      color: #70675c;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .bottom-nav b {
+      color: var(--blue-dark);
+    }
+
+    .lesson-glyph {
+      height: 250px;
+      margin: 16px 0;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: rgba(255, 252, 246, 0.55);
+    }
+
+    .lesson-glyph .vertical-glyph {
+      font-size: 96px;
+    }
+
+    .forms {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin: 12px 0 18px;
+    }
+
+    .form-cell {
+      min-height: 64px;
+      padding: 8px 4px;
+      text-align: center;
+    }
+
+    .form-cell .small {
+      font-size: 10px;
+      margin-bottom: 4px;
+    }
+
+    .form-cell b {
+      font-size: 28px;
+      font-family: "Noto Sans Mongolian", "Mongolian Baiti", serif;
+    }
+
+    .progress {
+      height: 8px;
+      border-radius: 99px;
+      background: rgba(32, 32, 29, 0.1);
+      overflow: hidden;
+      margin: 11px 0 18px;
+    }
+
+    .bar {
+      height: 100%;
+      width: 42%;
+      background: var(--blue);
+    }
+
+    .audio {
+      margin: 22px auto;
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background: var(--blue);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-size: 30px;
+      box-shadow: 0 12px 24px rgba(44, 110, 143, 0.24);
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .option {
+      min-height: 94px;
+      padding: 10px;
+      display: grid;
+      place-items: center;
+      font-size: 42px;
+    }
+
+    .option.correct {
+      border-color: rgba(59, 124, 110, 0.5);
+      background: rgba(59, 124, 110, 0.14);
+      color: var(--teal);
+    }
+
+    .feedback {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 82px;
+      padding: 13px;
+      border-radius: 8px;
+      background: rgba(59, 124, 110, 0.12);
+      border: 1px solid rgba(59, 124, 110, 0.35);
+      color: #24594e;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .image-box {
+      height: 190px;
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(44, 110, 143, 0.15), rgba(215, 164, 65, 0.16)),
+        #fffaf0;
+      border: 1px solid var(--line);
+      display: grid;
+      place-items: center;
+      margin: 10px 0 16px;
+    }
+
+    .image-mark {
+      width: 118px;
+      height: 86px;
+      border-radius: 48% 52% 45% 55%;
+      border: 8px solid #876449;
+      border-left-width: 18px;
+      position: relative;
+    }
+
+    .image-mark::before,
+    .image-mark::after {
+      content: "";
+      position: absolute;
+      background: #876449;
+      border-radius: 999px;
+    }
+
+    .image-mark::before {
+      width: 54px;
+      height: 14px;
+      right: -42px;
+      top: 13px;
+      transform: rotate(-18deg);
+    }
+
+    .image-mark::after {
+      width: 13px;
+      height: 74px;
+      left: 18px;
+      bottom: -52px;
+      box-shadow: 48px 0 0 #876449;
+    }
+
+    .result {
+      text-align: center;
+      padding-top: 36px;
+    }
+
+    .seal {
+      width: 128px;
+      height: 128px;
+      margin: 26px auto 18px;
+      border-radius: 50%;
+      background: var(--gold);
+      display: grid;
+      place-items: center;
+      color: #fff8e4;
+      font-size: 44px;
+      font-weight: 900;
+      box-shadow: inset 0 0 0 8px rgba(255,255,255,0.25);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 18px 0;
+    }
+
+    .stat {
+      padding: 12px 4px;
+      text-align: center;
+    }
+
+    .stat b {
+      display: block;
+      font-size: 20px;
+      margin-bottom: 3px;
+    }
+
+    .review-card {
+      padding: 15px;
+      min-height: 82px;
+      margin-bottom: 10px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .tab {
+      flex: 0 0 auto;
+      min-height: 32px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(32, 32, 29, 0.07);
+      font-size: 11px;
+      font-weight: 800;
+      color: #62594e;
+    }
+
+    .tab.active {
+      background: rgba(44, 110, 143, 0.14);
+      color: var(--blue-dark);
+    }
+
+    .lex-item {
+      padding: 13px;
+      margin-bottom: 10px;
+      display: grid;
+      grid-template-columns: 48px 1fr auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .lex-glyph {
+      height: 58px;
+      display: grid;
+      place-items: center;
+      font-size: 32px;
+      color: var(--ink);
+    }
+
+    .settings-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    @media (max-width: 760px) {
+      .board {
+        padding: 22px 14px;
+      }
+
+      .header {
+        grid-template-columns: 1fr;
+      }
+
+      .phone,
+      .screen-title {
+        width: min(310px, 100%);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="board">
+    <header class="header">
+      <div>
+        <h1>竖文启蒙 · 移动端产品原型</h1>
+        <p class="subtitle">原创方向：以传统蒙古文竖排字形、真人音频和学习手账为核心，不使用多邻国式闯关地图、绿色主视觉、动物助手或相似任务形象。</p>
+      </div>
+      <div class="principle">占位蒙古文仅用于原型展示；学习内容必须竖排，正式内容需蒙古语母语者或教师审核。</div>
+    </header>
+
+    <section class="grid" aria-label="产品原型屏幕">
+      <article class="screen-block">
+        <div class="screen-title"><strong>学习首页</strong><span>今日目标</span></div>
+        <div class="phone">
+          <div class="screen">
+            <div class="top">
+              <div>
+                <div class="kicker">今日学习</div>
+                <div class="title">5 分钟认识新字</div>
+              </div>
+              <div class="pill">4 天印章</div>
+            </div>
+            <div class="hero-card card">
+              <div>
+                <div class="kicker">今日新字</div>
+                <div class="title">基础元音一</div>
+                <p class="small">先听发音，再看字形变化。</p>
+                <button class="button">开始</button>
+              </div>
+              <div class="vertical-glyph">ᠠᠠᠠ</div>
+            </div>
+            <div class="small" style="margin-bottom:8px;font-weight:800;color:#4f463b;">第一单元：认识蒙古文</div>
+            <div class="course-list">
+              <div class="course card"><div class="stamp">✓</div><div><b>书写方向</b><div class="small">已完成</div></div><span class="small">3 分钟</span></div>
+              <div class="course card"><div class="stamp open">2</div><div><b>基础元音</b><div class="small">今天学习</div></div><span class="small">进行中</span></div>
+              <div class="course card"><div class="stamp todo">3</div><div><b>基础辅音</b><div class="small">未开始</div></div><span class="small">明天</span></div>
+            </div>
+            <nav class="bottom-nav"><b>学习</b><span>复习</span><span>词库</span><span>我的</span></nav>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen-block">
+        <div class="screen-title"><strong>字母课程</strong><span>字形展示</span></div>
+        <div class="phone">
+          <div class="screen">
+            <div class="top">
+              <div>
+                <div class="kicker">基础元音一</div>
+                <div class="title">听音，看字形</div>
+              </div>
+              <div class="pill">2 / 6</div>
+            </div>
+            <div class="progress"><div class="bar"></div></div>
+            <div class="lesson-glyph">
+              <div class="vertical-glyph">ᠠ</div>
+            </div>
+            <button class="button" style="width:100%;">播放发音</button>
+            <div class="forms">
+              <div class="form-cell card"><div class="small">独立</div><b>ᠠ</b></div>
+              <div class="form-cell card"><div class="small">词首</div><b>ᠠ</b></div>
+              <div class="form-cell card"><div class="small">词中</div><b>ᠠ</b></div>
+              <div class="form-cell card"><div class="small">词尾</div><b>ᠠ</b></div>
+            </div>
+            <p class="small">提示：先记住声音，再观察连接位置。</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen-block">
+        <div class="screen-title"><strong>听音选字</strong><span>练习题</span></div>
+        <div class="phone">
+          <div class="screen">
+            <div class="top">
+              <div>
+                <div class="kicker">听一听</div>
+                <div class="title">选出听到的字</div>
+              </div>
+              <div class="pill">3 / 6</div>
+            </div>
+            <div class="audio">▶</div>
+            <div class="options">
+              <div class="option card correct">ᠠ</div>
+              <div class="option card">ᠡ</div>
+              <div class="option card">ᠣ</div>
+              <div class="option card">ᠤ</div>
+            </div>
+            <div class="feedback"><b>读得对。</b><br>再听一遍，记住这个基础元音。</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen-block">
+        <div class="screen-title"><strong>看图选词</strong><span>儿童友好</span></div>
+        <div class="phone">
+          <div class="screen">
+            <div class="top">
+              <div>
+                <div class="kicker">动物词汇</div>
+                <div class="title">这是什么？</div>
+              </div>
+              <div class="pill">图片题</div>
+            </div>
+            <div class="image-box"><div class="image-mark" aria-label="马的示意图"></div></div>
+            <div class="options">
+              <div class="option card" style="font-size:30px;">ᠮᠣᠷᠢ</div>
+              <div class="option card" style="font-size:30px;">ᠬᠣᠨᠢ</div>
+              <div class="option card" style="font-size:30px;">ᠨᠣᠮ</div>
+              <div class="option card" style="font-size:30px;">ᠤᠰᠤ</div>
+            </div>
+            <button class="button" style="position:absolute;left:18px;right:18px;bottom:22px;">确认</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen-block">
+        <div class="screen-title"><strong>课程结果</strong><span>学习印章</span></div>
+        <div class="phone">
+          <div class="screen">
+            <div class="result">
+              <div class="kicker">今天完成了</div>
+              <div class="title">基础元音一</div>
+              <div class="seal">印</div>
+              <div class="stats">
+                <div class="stat card"><b>83%</b><span class="small">正确率</span></div>
+                <div class="stat card"><b>3</b><span class="small">新字</span></div>
+                <div class="stat card"><b>2</b><span class="small">复习</span></div>
+              </div>
+              <button class="button" style="width:100%;margin-top:14px;">复习错题</button>
+              <button class="button secondary" style="width:100%;margin-top:10px;">回到首页</button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen-block">
+        <div class="screen-title"><strong>复习页</strong><span>错题池</span></div>
+        <div class="phone">
+          <div class="screen">
+            <div class="top">
+              <div>
+                <div class="kicker">今日复习</div>
+                <div class="title">6 道题要再看</div>
+              </div>
+              <div class="pill">离线可用</div>
+            </div>
+            <div class="review-card card">
+              <div><b>字母连接</b><div class="small">3 道题 · 重点</div></div>
+              <div class="stamp open">练</div>
+            </div>
+            <div class="review-card card">
+              <div><b>家庭词汇</b><div class="small">2 道题 · 听音</div></div>
+              <div class="stamp todo">词</div>
+            </div>
+            <div class="review-card card">
+              <div><b>数字一到五</b><div class="small">1 道题 · 排序</div></div>
+              <div class="stamp todo">数</div>
+            </div>
+            <button class="button" style="position:absolute;left:18px;right:18px;bottom:86px;">开始复习</button>
+            <nav class="bottom-nav"><span>学习</span><b>复习</b><span>词库</span><span>我的</span></nav>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen-block">
+        <div class="screen-title"><strong>词库页</strong><span>已学内容</span></div>
+        <div class="phone">
+          <div class="screen">
+            <div class="top">
+              <div>
+                <div class="kicker">词库</div>
+                <div class="title">已学 16 个</div>
+              </div>
+              <div class="pill">可听可练</div>
+            </div>
+            <div class="tabs">
+              <div class="tab active">全部</div>
+              <div class="tab">字母</div>
+              <div class="tab">家庭</div>
+              <div class="tab">动物</div>
+            </div>
+            <div class="lex-item card">
+              <div class="lex-glyph">ᠠ</div>
+              <div><b>基础元音</b><div class="small">第 2 课学习</div></div>
+              <span class="small">听</span>
+            </div>
+            <div class="lex-item card">
+              <div class="lex-glyph">ᠮᠣᠷᠢ</div>
+              <div><b>马</b><div class="small">动物词汇</div></div>
+              <span class="small">练</span>
+            </div>
+            <div class="lex-item card">
+              <div class="lex-glyph">ᠨᠣᠮ</div>
+              <div><b>书</b><div class="small">学校用品</div></div>
+              <span class="small">练</span>
+            </div>
+            <nav class="bottom-nav"><span>学习</span><span>复习</span><b>词库</b><span>我的</span></nav>
+          </div>
+        </div>
+      </article>
+
+      <article class="screen-block">
+        <div class="screen-title"><strong>我的页</strong><span>设置</span></div>
+        <div class="phone">
+          <div class="screen">
+            <div class="top">
+              <div>
+                <div class="kicker">我的学习</div>
+                <div class="title">稳稳学 4 天</div>
+              </div>
+              <div class="stamp">印</div>
+            </div>
+            <div class="stats">
+              <div class="stat card"><b>4</b><span class="small">连续天数</span></div>
+              <div class="stat card"><b>16</b><span class="small">已学</span></div>
+              <div class="stat card"><b>3</b><span class="small">课程</span></div>
+            </div>
+            <div class="card" style="padding:0 14px;margin-top:18px;">
+              <div class="settings-row"><b>学习模式</b><span class="small">儿童</span></div>
+              <div class="settings-row"><b>每日目标</b><span class="small">5 分钟</span></div>
+              <div class="settings-row"><b>离线课程</b><span class="small">已下载</span></div>
+              <div class="settings-row" style="border-bottom:0;"><b>家长设置</b><span class="small">进入</span></div>
+            </div>
+            <nav class="bottom-nav"><span>学习</span><span>复习</span><span>词库</span><b>我的</b></nav>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

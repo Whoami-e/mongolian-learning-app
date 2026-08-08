@@ -1,0 +1,753 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>草原字母岛 - 游戏化原型</title>
+  <style>
+    :root {
+      --bg: #eef6fc;
+      --panel: #ffffff;
+      --ink: #1f2a37;
+      --muted: #667085;
+      --blue: #2e8ccf;
+      --blue-dark: #1267a6;
+      --yellow: #f5b93f;
+      --green: #19a974;
+      --red: #ef5b4c;
+      --purple: #8b5cf6;
+      --line: #d6e3ee;
+      --shadow: 0 18px 38px rgba(31, 42, 55, 0.16);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+      color: var(--ink);
+      background: #cfe2f1;
+    }
+
+    .canvas {
+      min-height: 100vh;
+      padding: 34px;
+      background:
+        radial-gradient(circle at 12% 18%, rgba(245,185,63,.22), transparent 28%),
+        linear-gradient(135deg, #d7eefc, #f4f7fb 58%, #dcedf5);
+    }
+
+    .intro {
+      max-width: 1280px;
+      margin: 0 auto 24px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 20px;
+      align-items: end;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 34px;
+      letter-spacing: 0;
+    }
+
+    .note {
+      margin: 0;
+      max-width: 760px;
+      color: #435264;
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    .rule {
+      max-width: 360px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.78);
+      border: 1px solid rgba(255,255,255,.9);
+      color: #435264;
+      line-height: 1.55;
+      font-size: 13px;
+    }
+
+    .grid {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 28px;
+      align-items: start;
+    }
+
+    .block {
+      display: grid;
+      gap: 12px;
+      justify-items: center;
+    }
+
+    .label {
+      width: 310px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .label strong {
+      font-size: 15px;
+    }
+
+    .label span {
+      color: #516174;
+      font-size: 12px;
+    }
+
+    .phone {
+      width: 310px;
+      height: 670px;
+      padding: 14px;
+      border-radius: 32px;
+      background: #162233;
+      box-shadow: var(--shadow);
+    }
+
+    .screen {
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+      border-radius: 24px;
+      background: var(--bg);
+    }
+
+    .pad {
+      padding: 16px;
+    }
+
+    .status {
+      height: 42px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 900;
+      color: #334155;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 30px;
+      border-radius: 999px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: 0 4px 0 rgba(103, 132, 155, .12);
+    }
+
+    .hero {
+      min-height: 116px;
+      padding: 16px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, var(--blue), #46a9e7);
+      color: #fff;
+      box-shadow: 0 8px 0 var(--blue-dark);
+    }
+
+    .kicker {
+      font-size: 12px;
+      font-weight: 900;
+      opacity: .86;
+    }
+
+    .title {
+      margin-top: 4px;
+      font-size: 22px;
+      line-height: 1.16;
+      font-weight: 1000;
+    }
+
+    .small {
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 12px;
+    }
+
+    .hero .small {
+      color: rgba(255,255,255,.82);
+    }
+
+    .path {
+      position: relative;
+      height: 390px;
+      margin-top: 14px;
+    }
+
+    .dash {
+      position: absolute;
+      inset: 18px 72px 22px 72px;
+      border-left: 8px dotted rgba(46, 140, 207, .26);
+      transform: rotate(8deg);
+    }
+
+    .node {
+      position: absolute;
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 1000;
+      font-size: 25px;
+      background: #b8c7d6;
+      border: 5px solid #fff;
+      box-shadow: 0 8px 0 rgba(63, 82, 100, .18);
+    }
+
+    .node.done {
+      background: var(--green);
+    }
+
+    .node.current {
+      background: var(--blue);
+      width: 78px;
+      height: 78px;
+      box-shadow: 0 9px 0 var(--blue-dark), 0 0 0 8px rgba(46,140,207,.12);
+    }
+
+    .node.current,
+    .glyph-stage,
+    .option {
+      writing-mode: vertical-lr;
+      text-orientation: sideways;
+      font-family: "Noto Sans Mongolian", "Mongolian Baiti", serif;
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+
+    .node.chest {
+      background: var(--yellow);
+      color: #7a4d00;
+    }
+
+    .node.lock {
+      background: #a7b4c1;
+      font-size: 22px;
+    }
+
+    .n1 { left: 42px; top: 18px; }
+    .n2 { right: 42px; top: 82px; }
+    .n3 { left: 54px; top: 164px; }
+    .n4 { right: 52px; top: 238px; }
+    .n5 { left: 62px; top: 316px; }
+
+    .bubble {
+      position: absolute;
+      right: 12px;
+      top: 174px;
+      width: 126px;
+      padding: 10px;
+      border-radius: 14px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: 0 6px 0 rgba(103, 132, 155, .12);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .tabs {
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      height: 58px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      align-items: center;
+      text-align: center;
+      gap: 5px;
+      border-radius: 18px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: 0 -4px 22px rgba(31,42,55,.06);
+      font-size: 11px;
+      font-weight: 900;
+      color: #6b7b8c;
+    }
+
+    .tabs b {
+      color: var(--blue);
+    }
+
+    .button {
+      width: 100%;
+      min-height: 48px;
+      border: 0;
+      border-radius: 14px;
+      background: var(--blue);
+      color: #fff;
+      font-weight: 1000;
+      font-size: 15px;
+      box-shadow: 0 5px 0 var(--blue-dark);
+    }
+
+    .button.green {
+      background: var(--green);
+      box-shadow: 0 5px 0 #0d7c53;
+    }
+
+    .button.ghost {
+      background: #fff;
+      color: var(--blue);
+      border: 1px solid var(--line);
+      box-shadow: 0 5px 0 #d4e0eb;
+    }
+
+    .progress {
+      height: 12px;
+      border-radius: 99px;
+      background: #d8e5ef;
+      overflow: hidden;
+      margin: 12px 0 18px;
+    }
+
+    .bar {
+      height: 100%;
+      width: 48%;
+      background: var(--green);
+    }
+
+    .lesson-card {
+      padding: 20px;
+      border-radius: 18px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: 0 6px 0 rgba(103, 132, 155, .12);
+    }
+
+    .glyph-stage {
+      height: 172px;
+      display: grid;
+      place-items: center;
+      margin: 18px 0;
+      border-radius: 18px;
+      background: #f8fbfe;
+      border: 2px dashed #c8d7e5;
+      font-size: 88px;
+    }
+
+    .audio {
+      width: 108px;
+      height: 108px;
+      margin: 44px auto 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--blue);
+      color: #fff;
+      font-size: 34px;
+      box-shadow: 0 8px 0 var(--blue-dark);
+    }
+
+    .question {
+      font-size: 20px;
+      font-weight: 1000;
+      line-height: 1.25;
+      margin: 6px 0 0;
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .option {
+      min-height: 92px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      background: var(--panel);
+      border: 2px solid var(--line);
+      box-shadow: 0 5px 0 #d7e3ee;
+      font-size: 40px;
+      font-weight: 900;
+    }
+
+    .option.selected {
+      border-color: var(--blue);
+      background: #e9f6ff;
+      box-shadow: 0 5px 0 #b7dcf5;
+    }
+
+    .answer {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 18px 16px 20px;
+      border-radius: 22px 22px 0 0;
+      background: #e7f7ef;
+      border-top: 2px solid #b5e5ce;
+    }
+
+    .answer.bad {
+      background: #ffeded;
+      border-color: #ffc1bb;
+    }
+
+    .answer-title {
+      color: var(--green);
+      font-size: 22px;
+      font-weight: 1000;
+      margin-bottom: 4px;
+    }
+
+    .answer.bad .answer-title {
+      color: var(--red);
+    }
+
+    .reward {
+      text-align: center;
+      padding: 56px 16px 0;
+    }
+
+    .medal {
+      width: 142px;
+      height: 142px;
+      display: grid;
+      place-items: center;
+      margin: 24px auto 18px;
+      border-radius: 36px;
+      background: linear-gradient(135deg, var(--yellow), #ffd76e);
+      color: #7d5000;
+      font-size: 54px;
+      font-weight: 1000;
+      box-shadow: 0 9px 0 #c78b19;
+      transform: rotate(-4deg);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 20px 0;
+    }
+
+    .stat {
+      min-height: 76px;
+      padding: 11px 4px;
+      text-align: center;
+      border-radius: 14px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: 0 4px 0 #d7e3ee;
+    }
+
+    .stat b {
+      display: block;
+      font-size: 20px;
+      margin-bottom: 3px;
+    }
+
+    .quest {
+      display: grid;
+      grid-template-columns: 42px 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      border-radius: 16px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: 0 4px 0 #d7e3ee;
+    }
+
+    .icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: var(--purple);
+      font-weight: 1000;
+    }
+
+    .mini-bar {
+      height: 8px;
+      margin-top: 7px;
+      border-radius: 99px;
+      background: #e2edf6;
+      overflow: hidden;
+    }
+
+    .mini-fill {
+      width: 65%;
+      height: 100%;
+      background: var(--yellow);
+    }
+
+    .rank-item {
+      display: grid;
+      grid-template-columns: 34px 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      margin-bottom: 9px;
+      border-radius: 16px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: 0 4px 0 #d7e3ee;
+    }
+
+    @media (max-width: 760px) {
+      .canvas {
+        padding: 22px 14px;
+      }
+
+      .intro {
+        grid-template-columns: 1fr;
+      }
+
+      .phone,
+      .label {
+        width: min(310px, 100%);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="canvas">
+    <header class="intro">
+      <div>
+        <h1>草原字母岛 · 游戏化学习原型</h1>
+        <p class="note">这版把机制调成强游戏化：路径、红心、XP、宝石、每日任务、错题复活和本地排行。视觉和形象保持原创，不复用多邻国品牌资产。</p>
+      </div>
+      <div class="rule">蒙古文内容仍为原型占位；学习内容必须竖排展示，正式课程需要内蒙古标准音和传统蒙古文审核。</div>
+    </header>
+
+    <section class="grid">
+      <article class="block">
+        <div class="label"><strong>课程路径</strong><span>首页</span></div>
+        <div class="phone">
+          <div class="screen pad">
+            <div class="status">
+              <div class="chip">🔥 4</div>
+              <div class="chip">♥ 5</div>
+              <div class="chip">◆ 120</div>
+              <div class="chip">XP 45</div>
+            </div>
+            <div class="hero">
+              <div class="kicker">第一大关</div>
+              <div class="title">认识蒙古文</div>
+              <p class="small">完成今天的课程，保住连续学习。</p>
+            </div>
+            <div class="path">
+              <div class="dash"></div>
+              <div class="node done n1">✓</div>
+              <div class="node current n2">ᠠ</div>
+              <div class="bubble"><b>基础元音一</b><br><span class="small">10 XP · 3 个新字母</span></div>
+              <div class="node chest n3">◆</div>
+              <div class="node lock n4">锁</div>
+              <div class="node lock n5">★</div>
+            </div>
+            <nav class="tabs"><b>学习</b><span>任务</span><span>练习</span><span>排行</span><span>我的</span></nav>
+          </div>
+        </div>
+      </article>
+
+      <article class="block">
+        <div class="label"><strong>课程开始</strong><span>关卡入口</span></div>
+        <div class="phone">
+          <div class="screen pad">
+            <div class="status">
+              <div class="chip">🔥 4</div>
+              <div class="chip">♥ 5</div>
+              <div class="chip">◆ 120</div>
+              <div class="chip">10 XP</div>
+            </div>
+            <div class="lesson-card" style="margin-top:28px;">
+              <div class="kicker" style="color:var(--blue);">第 2 课</div>
+              <div class="title">基础元音一</div>
+              <p class="small">先听 3 个基础元音，再完成 6 道练习。</p>
+              <div class="glyph-stage">ᠠ</div>
+              <div class="stats">
+                <div class="stat"><b>3</b><span class="small">新字</span></div>
+                <div class="stat"><b>6</b><span class="small">题目</span></div>
+                <div class="stat"><b>10</b><span class="small">XP</span></div>
+              </div>
+              <button class="button">开始挑战</button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="block">
+        <div class="label"><strong>听音选字</strong><span>答题中</span></div>
+        <div class="phone">
+          <div class="screen pad">
+            <div class="status">
+              <div class="chip">2 / 6</div>
+              <div class="chip">♥ 5</div>
+              <div class="chip">连对 2</div>
+              <div class="chip">+10</div>
+            </div>
+            <div class="progress"><div class="bar"></div></div>
+            <p class="question">听一听，选出正确的字</p>
+            <div class="audio">▶</div>
+            <div class="options">
+              <div class="option selected">ᠠ</div>
+              <div class="option">ᠡ</div>
+              <div class="option">ᠣ</div>
+              <div class="option">ᠤ</div>
+            </div>
+            <button class="button" style="position:absolute;left:16px;right:16px;bottom:18px;width:auto;">确认</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="block">
+        <div class="label"><strong>正确反馈</strong><span>加 XP</span></div>
+        <div class="phone">
+          <div class="screen pad">
+            <div class="status">
+              <div class="chip">3 / 6</div>
+              <div class="chip">♥ 5</div>
+              <div class="chip">连对 3</div>
+              <div class="chip">+5 XP</div>
+            </div>
+            <div class="progress"><div class="bar" style="width:63%;"></div></div>
+            <p class="question">选出“马”的传统蒙古文</p>
+            <div class="options">
+              <div class="option selected" style="font-size:30px;">ᠮᠣᠷᠢ</div>
+              <div class="option" style="font-size:30px;">ᠬᠣᠨᠢ</div>
+              <div class="option" style="font-size:30px;">ᠨᠣᠮ</div>
+              <div class="option" style="font-size:30px;">ᠤᠰᠤ</div>
+            </div>
+            <div class="answer">
+              <div class="answer-title">正确</div>
+              <div class="small">本题 +5 XP。继续保持连对。</div>
+              <button class="button green" style="margin-top:12px;">继续</button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="block">
+        <div class="label"><strong>错误反馈</strong><span>扣红心</span></div>
+        <div class="phone">
+          <div class="screen pad">
+            <div class="status">
+              <div class="chip">4 / 6</div>
+              <div class="chip">♥ 4</div>
+              <div class="chip">错题 +1</div>
+              <div class="chip">XP 15</div>
+            </div>
+            <div class="progress"><div class="bar" style="width:72%;"></div></div>
+            <p class="question">补全这个字母组合</p>
+            <div class="glyph-stage" style="font-size:58px;">ᠮ _ ᠷᠢ</div>
+            <div class="options">
+              <div class="option selected">ᠡ</div>
+              <div class="option">ᠣ</div>
+            </div>
+            <div class="answer bad">
+              <div class="answer-title">再看一次</div>
+              <div class="small">正确答案是 ᠣ。本题会进入课后复习。</div>
+              <button class="button" style="margin-top:12px;background:var(--red);box-shadow:0 5px 0 #b9372b;">继续</button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="block">
+        <div class="label"><strong>课程完成</strong><span>奖励</span></div>
+        <div class="phone">
+          <div class="screen">
+            <div class="reward">
+              <div class="kicker" style="color:var(--blue);">课程完成</div>
+              <div class="title">基础元音一</div>
+              <div class="medal">+15</div>
+              <div class="stats">
+                <div class="stat"><b>15</b><span class="small">XP</span></div>
+                <div class="stat"><b>83%</b><span class="small">正确率</span></div>
+                <div class="stat"><b>4</b><span class="small">连胜</span></div>
+              </div>
+              <button class="button">继续下一课</button>
+              <button class="button ghost" style="margin-top:12px;">复习错题</button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="block">
+        <div class="label"><strong>每日任务</strong><span>Quest</span></div>
+        <div class="phone">
+          <div class="screen pad">
+            <div class="status">
+              <div class="chip">🔥 4</div>
+              <div class="chip">♥ 5</div>
+              <div class="chip">◆ 120</div>
+              <div class="chip">XP 45</div>
+            </div>
+            <div class="title" style="margin:16px 0;">今日任务</div>
+            <div class="quest">
+              <div class="icon">课</div>
+              <div><b>完成 1 节课程</b><div class="mini-bar"><div class="mini-fill" style="width:100%;"></div></div></div>
+              <b>+10</b>
+            </div>
+            <div class="quest">
+              <div class="icon" style="background:var(--blue);">听</div>
+              <div><b>答对 5 道听音题</b><div class="mini-bar"><div class="mini-fill" style="width:60%;"></div></div></div>
+              <b>+5</b>
+            </div>
+            <div class="quest">
+              <div class="icon" style="background:var(--green);">练</div>
+              <div><b>复习 3 道错题</b><div class="mini-bar"><div class="mini-fill" style="width:33%;"></div></div></div>
+              <b>◆5</b>
+            </div>
+            <button class="button" style="position:absolute;left:16px;right:16px;bottom:84px;width:auto;">去学习</button>
+            <nav class="tabs"><span>学习</span><b>任务</b><span>练习</span><span>排行</span><span>我的</span></nav>
+          </div>
+        </div>
+      </article>
+
+      <article class="block">
+        <div class="label"><strong>本地排行</strong><span>自己玩</span></div>
+        <div class="phone">
+          <div class="screen pad">
+            <div class="status">
+              <div class="chip">🔥 4</div>
+              <div class="chip">♥ 5</div>
+              <div class="chip">◆ 120</div>
+              <div class="chip">XP 45</div>
+            </div>
+            <div class="title" style="margin:16px 0;">本周记录</div>
+            <div class="rank-item">
+              <b>1</b><div><b>今天</b><div class="small">完成 3 节课</div></div><b>45 XP</b>
+            </div>
+            <div class="rank-item">
+              <b>2</b><div><b>昨天</b><div class="small">复习错题</div></div><b>30 XP</b>
+            </div>
+            <div class="rank-item">
+              <b>3</b><div><b>周一</b><div class="small">学习字母</div></div><b>20 XP</b>
+            </div>
+            <div class="lesson-card" style="margin-top:18px;">
+              <div class="kicker" style="color:var(--purple);">练习恢复红心</div>
+              <div class="title">错题复活</div>
+              <p class="small">答对 5 道复习题，恢复 1 颗红心。</p>
+              <button class="button ghost">开始练习</button>
+            </div>
+            <nav class="tabs"><span>学习</span><span>任务</span><span>练习</span><b>排行</b><span>我的</span></nav>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+</body>
+</html>
